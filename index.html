@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSK4词汇填空挑战游戏 - 完整分析版</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 1200px;
+            background-color: rgba(255, 255, 255, 0.97);
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            padding: 25px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #ff9a00;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            color: #2575fc;
+            font-size: 2.8rem;
+        }
+
+        .logo-text h1 {
+            color: #2575fc;
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+        }
+
+        .logo-text p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .stats {
+            display: flex;
+            gap: 25px;
+            text-align: center;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #ff9a00, #ffcc00);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 16px;
+            min-width: 120px;
+            box-shadow: 0 6px 12px rgba(255, 154, 0, 0.3);
+        }
+
+        .stat-box h3 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-box p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .timer {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 16px;
+            min-width: 120px;
+            box-shadow: 0 6px 12px rgba(255, 65, 108, 0.3);
+        }
+
+        .timer h3 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .timer p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .progress-container {
+            margin-bottom: 25px;
+        }
+
+        .progress-bar {
+            height: 16px;
+            background-color: #e6e6e6;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #2575fc, #6a11cb);
+            width: 1%;
+            transition: width 0.5s ease;
+            border-radius: 8px;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .question-container {
+            background-color: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            border: 2px solid #e6f0ff;
+        }
+
+        .question-number {
+            color: #2575fc;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .question-number i {
+            font-size: 1.4rem;
+        }
+
+        .question-text {
+            font-size: 1.8rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .blank {
+            display: inline-block;
+            min-width: 100px;
+            height: 50px;
+            background-color: #f0f5ff;
+            border: 2px dashed #6a11cb;
+            border-radius: 10px;
+            margin: 0 8px;
+            vertical-align: middle;
+            text-align: center;
+            line-height: 46px;
+            font-weight: bold;
+            color: #6a11cb;
+            transition: all 0.3s;
+        }
+
+        .blank.filled {
+            background-color: #e6f0ff;
+            border: 2px solid #2575fc;
+            color: #2575fc;
+        }
+
+        .options-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .option {
+            background: linear-gradient(135deg, #43cea2, #185a9d);
+            color: white;
+            padding: 14px 22px;
+            border-radius: 12px;
+            font-size: 1.3rem;
+            cursor: grab;
+            user-select: none;
+            transition: all 0.3s;
+            box-shadow: 0 6px 12px rgba(67, 206, 162, 0.3);
+            text-align: center;
+            min-width: 120px;
+            position: relative;
+        }
+
+        .option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 18px rgba(67, 206, 162, 0.4);
+        }
+
+        .option.used {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .option-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            margin-bottom: 5px;
+        }
+
+        .option:hover .option-tooltip {
+            opacity: 1;
+        }
+
+        .explanation-container {
+            background-color: #f9f9ff;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 6px solid #ff9a00;
+            display: none;
+        }
+
+        .explanation-container.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .explanation-title {
+            color: #2575fc;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .explanation-content {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .explanation-section {
+            margin-bottom: 15px;
+            padding: 12px;
+            background-color: white;
+            border-radius: 10px;
+            border-left: 4px solid #43cea2;
+        }
+
+        .section-title {
+            color: #ff416c;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pinyin {
+            color: #6a11cb;
+            font-weight: 600;
+        }
+
+        .meaning {
+            color: #ff9a00;
+            font-weight: 600;
+        }
+
+        .correct-answer {
+            color: #2575fc;
+            font-weight: 600;
+        }
+
+        .grammar-analysis {
+            background-color: #f0f5ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border-left: 4px solid #ff9a00;
+        }
+
+        .grammar-title {
+            color: #2575fc;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .grammar-item {
+            margin-bottom: 8px;
+            padding-left: 10px;
+            border-left: 3px solid #43cea2;
+        }
+
+        .grammar-part {
+            display: inline-block;
+            background-color: #e6f0ff;
+            padding: 3px 8px;
+            border-radius: 5px;
+            margin: 0 5px;
+            font-weight: 500;
+        }
+
+        .grammar-part.subject {
+            background-color: #ffebee;
+            color: #ff416c;
+        }
+
+        .grammar-part.verb {
+            background-color: #e8f5e9;
+            color: #43cea2;
+        }
+
+        .grammar-part.object {
+            background-color: #e3f2fd;
+            color: #2575fc;
+        }
+
+        .grammar-part.adverb {
+            background-color: #fff3e0;
+            color: #ff9800;
+        }
+
+        .options-analysis {
+            background-color: #fff8e1;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .option-analysis-item {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 6px;
+            background-color: white;
+        }
+
+        .option-analysis-item.correct {
+            border-left: 4px solid #43cea2;
+            background-color: #f1f8e9;
+        }
+
+        .option-analysis-item.incorrect {
+            border-left: 4px solid #ff5252;
+            background-color: #ffebee;
+        }
+
+        .option-word {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .buttons-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #2575fc, #6a11cb);
+            color: white;
+            box-shadow: 0 6px 15px rgba(37, 117, 252, 0.4);
+        }
+
+        .btn-next:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(37, 117, 252, 0.5);
+        }
+
+        .btn-next:disabled {
+            background: linear-gradient(135deg, #cccccc, #999999);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, #ff9a00, #ffcc00);
+            color: white;
+            box-shadow: 0 6px 15px rgba(255, 154, 0, 0.4);
+        }
+
+        .btn-restart:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255, 154, 0, 0.5);
+        }
+
+        .game-over {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .game-over.show {
+            display: block;
+            animation: fadeIn 0.8s;
+        }
+
+        .trophy {
+            font-size: 5rem;
+            color: #ffcc00;
+            margin-bottom: 20px;
+            text-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-over h2 {
+            color: #2575fc;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .score-display {
+            font-size: 3rem;
+            color: #ff416c;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        .feedback {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: #555;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .stats {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .question-text {
+                font-size: 1.5rem;
+            }
+            
+            .option {
+                font-size: 1.1rem;
+                padding: 12px 18px;
+                min-width: 100px;
+            }
+            
+            .buttons-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .explanation-content {
+                font-size: 1rem;
+            }
+            
+            .option-tooltip {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- 游戏头部信息 -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-language"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>HSK4 词汇填空挑战</h1>
+                    <p>拖放单词完成句子 | 含完整选项分析</p>
+                </div>
+            </div>
+            <div class="stats">
+                <div class="stat-box">
+                    <h3 id="current-question">1</h3>
+                    <p>当前题目</p>
+                </div>
+                <div class="timer">
+                    <h3 id="time-left">80:00</h3>
+                    <p>剩余时间</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 进度条 -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-text">
+                <span>进度: <span id="progress-text">1%</span></span>
+                <span>正确: <span id="correct-count">0</span>/<span id="total-questions">100</span></span>
+            </div>
+        </div>
+
+        <!-- 问题容器 -->
+        <div class="question-container" id="question-container">
+            <div class="question-number">
+                <i class="fas fa-question-circle"></i>
+                <span>第 <span id="question-number">1</span> 题</span>
+            </div>
+            <div class="question-text" id="question-text"></div>
+            
+            <!-- 选项容器 -->
+            <div class="options-container" id="options-container"></div>
+            
+            <!-- 解释容器 -->
+            <div class="explanation-container" id="explanation-container">
+                <div class="explanation-title">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>详细解释与分析</span>
+                </div>
+                <div class="explanation-content" id="explanation-content"></div>
+            </div>
+        </div>
+
+        <!-- 按钮容器 -->
+        <div class="buttons-container">
+            <button class="btn btn-restart" id="restart-btn">
+                <i class="fas fa-redo"></i>
+                重新开始
+            </button>
+            <button class="btn btn-next" id="next-btn" disabled>
+                下一题
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+
+        <!-- 游戏结束界面 -->
+        <div class="game-over" id="game-over">
+            <div class="trophy">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <h2>游戏完成!</h2>
+            <div class="score-display" id="final-score">0/100</div>
+            <div class="feedback" id="feedback-text"></div>
+            <button class="btn btn-restart" id="play-again-btn">
+                <i class="fas fa-play"></i>
+                再玩一次
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 词汇词典 - 包含所有选项的拼音和印尼语释义
+        const vocabularyDict = {
+            "跑": { pinyin: "pǎo", meaning: "lari", type: "动词" },
+            "走": { pinyin: "zǒu", meaning: "berjalan", type: "动词" },
+            "运动": { pinyin: "yùndòng", meaning: "olahraga", type: "名词/动词" },
+            "锻炼": { pinyin: "duànliàn", meaning: "latihan (fisik)", type: "动词" },
+            "看": { pinyin: "kàn", meaning: "melihat, menonton", type: "动词" },
+            "观察": { pinyin: "guānchá", meaning: "mengamati", type: "动词" },
+            "观看": { pinyin: "guānkàn", meaning: "menyaksikan", type: "动词" },
+            "瞧": { pinyin: "qiáo", meaning: "melihat (informal)", type: "动词" },
+            "发音": { pinyin: "fāyīn", meaning: "pelafalan", type: "名词" },
+            "声音": { pinyin: "shēngyīn", meaning: "suara", type: "名词" },
+            "说话": { pinyin: "shuōhuà", meaning: "berbicara", type: "动词" },
+            "语言": { pinyin: "yǔyán", meaning: "bahasa", type: "名词" },
+            "节目": { pinyin: "jiémù", meaning: "program (TV, acara)", type: "名词" },
+            "项目": { pinyin: "xiàngmù", meaning: "proyek", type: "名词" },
+            "问题": { pinyin: "wèntí", meaning: "masalah, pertanyaan", type: "名词" },
+            "事情": { pinyin: "shìqing", meaning: "hal, urusan", type: "名词" },
+            "提醒": { pinyin: "tíxǐng", meaning: "mengingatkan", type: "动词" },
+            "告诉": { pinyin: "gàosu", meaning: "memberitahu", type: "动词" },
+            "说": { pinyin: "shuō", meaning: "berkata", type: "动词" },
+            "通知": { pinyin: "tōngzhī", meaning: "memberitahukan (resmi)", type: "动词" },
+            "感兴趣": { pinyin: "gǎn xìngqù", meaning: "tertarik", type: "动词短语" },
+            "喜欢": { pinyin: "xǐhuan", meaning: "suka", type: "动词" },
+            "爱好": { pinyin: "àihào", meaning: "hobi", type: "名词" },
+            "热爱": { pinyin: "rè'ài", meaning: "mencintai (dalam)", type: "动词" },
+            "总是": { pinyin: "zǒngshì", meaning: "selalu", type: "副词" },
+            "经常": { pinyin: "jīngcháng", meaning: "sering", type: "副词" },
+            "通常": { pinyin: "tōngcháng", meaning: "biasanya", type: "副词" },
+            "常常": { pinyin: "chángcháng", meaning: "sering", type: "副词" },
+            "尝": { pinyin: "cháng", meaning: "mencicipi", type: "动词" },
+            "吃": { pinyin: "chī", meaning: "makan", type: "动词" },
+            "试": { pinyin: "shì", meaning: "mencoba", type: "动词" },
+            "品": { pinyin: "pǐn", meaning: "mengecap (rasa)", type: "动词" },
+            "高兴": { pinyin: "gāoxìng", meaning: "senang", type: "形容词" },
+            "快乐": { pinyin: "kuàilè", meaning: "bahagia", type: "形容词" },
+            "兴奋": { pinyin: "xīngfèn", meaning: "bersemangat", type: "形容词" },
+            "激动": { pinyin: "jīdòng", meaning: "terharu, bersemangat", type: "形容词" },
+            "计划": { pinyin: "jìhuà", meaning: "rencana", type: "名词/动词" },
+            "打算": { pinyin: "dǎsuàn", meaning: "bermaksud", type: "动词" },
+            "准备": { pinyin: "zhǔnbèi", meaning: "bersiap", type: "动词" },
+            "安排": { pinyin: "ānpái", meaning: "mengatur", type: "动词" },
+            "变化": { pinyin: "biànhuà", meaning: "perubahan", type: "名词/动词" },
+            "改变": { pinyin: "gǎibiàn", meaning: "mengubah", type: "动词" },
+            "变成": { pinyin: "biànchéng", meaning: "menjadi", type: "动词" },
+            "转变": { pinyin: "zhuǎnbiàn", meaning: "berubah (arah)", type: "动词" },
+            "提高": { pinyin: "tígāo", meaning: "meningkatkan", type: "动词" },
+            "进步": { pinyin: "jìnbù", meaning: "kemajuan", type: "名词/动词" },
+            "增加": { pinyin: "zēngjiā", meaning: "menambah", type: "动词" },
+            "上升": { pinyin: "shàngshēng", meaning: "naik", type: "动词" },
+            "做": { pinyin: "zuò", meaning: "membuat", type: "动词" },
+            "煮": { pinyin: "zhǔ", meaning: "merebus", type: "动词" },
+            "炒": { pinyin: "chǎo", meaning: "menumis", type: "动词" },
+            "烧": { pinyin: "shāo", meaning: "membakar", type: "动词" },
+            "即使": { pinyin: "jíshǐ", meaning: "meskipun", type: "连词" },
+            "虽然": { pinyin: "suīrán", meaning: "walaupun", type: "连词" },
+            "尽管": { pinyin: "jǐnguǎn", meaning: "meskipun", type: "连词" },
+            "就算": { pinyin: "jiùsuàn", meaning: "bahkan jika", type: "连词" }
+        };
+
+        // 游戏数据 - HSK4词汇和句子，包含语法分解和选项分析
+        const hsk4Questions = [
+            {
+                sentence: "我每天晚上都去操场______半个小时步。",
+                options: ["跑", "走", "运动", "锻炼"],
+                answer: "跑",
+                pinyin: "pǎo",
+                meaning: "lari",
+                english: "run",
+                grammar: [
+                    {part: "主语", text: "我", type: "subject"},
+                    {part: "时间状语", text: "每天晚上", type: "adverb"},
+                    {part: "副词", text: "都", type: "adverb"},
+                    {part: "谓语", text: "去操场", type: "verb"},
+                    {part: "动词填空", text: "跑", type: "verb"},
+                    {part: "时间补语", text: "半个小时", type: "adverb"},
+                    {part: "宾语", text: "步", type: "object"}
+                ],
+                grammarExplanation: "这是一个典型的时间状语在前的汉语句子。'每天晚上'是时间状语，'去操场'是地点状语，'跑'是主要动词，'半个小时'是持续时间补语。",
+                optionAnalysis: {
+                    "跑": "正确。'跑步'是固定搭配，表示'jogging'或'running'。在'去操场跑半个小时步'中，'跑'与'步'搭配使用，表示跑步运动。",
+                    "走": "不正确。虽然'走'也是运动，但'走步'不常用，通常说'散步'。在这个语境中，'跑步'比'走路'更合适。",
+                    "运动": "不正确。'运动'是更广泛的词，包含各种体育活动，但在这个具体句子中需要与'步'搭配的特定动词。",
+                    "锻炼": "不正确。'锻炼'意思是'exercise'，但通常不与'步'直接搭配。可以说'锻炼身体'，但不能说'锻炼步'。"
+                }
+            },
+            {
+                sentence: "周末我喜欢在家______电视，放松一下。",
+                options: ["看", "观察", "观看", "瞧"],
+                answer: "看",
+                pinyin: "kàn",
+                meaning: "melihat, menonton",
+                english: "watch",
+                grammar: [
+                    {part: "时间状语", text: "周末", type: "adverb"},
+                    {part: "主语", text: "我", type: "subject"},
+                    {part: "谓语", text: "喜欢", type: "verb"},
+                    {part: "地点状语", text: "在家", type: "adverb"},
+                    {part: "动词填空", text: "看", type: "verb"},
+                    {part: "宾语", text: "电视", type: "object"},
+                    {part: "目的补语", text: "放松一下", type: "adverb"}
+                ],
+                grammarExplanation: "'喜欢'是心理动词，后面可以接动词短语作宾语。'在家'是地点状语，放在动词前。'放松一下'表示目的。",
+                optionAnalysis: {
+                    "看": "正确。'看电视'是固定搭配，最常用表示'watch TV'。",
+                    "观察": "不正确。'观察'意思是'observe'，用于科学研究或仔细观察某物，不用于看电视。",
+                    "观看": "部分正确但不自然。'观看'意思是'watch'，但更正式，常用于体育比赛或演出，如'观看比赛'。看电视通常用'看'。",
+                    "瞧": "不正确。'瞧'是方言或口语，意思是'look'，短暂地看，不用于看电视这种持续活动。"
+                }
+            },
+            {
+                sentence: "他的汉语______得真好，听起来像本地人。",
+                options: ["发音", "声音", "说话", "语言"],
+                answer: "发音",
+                pinyin: "fāyīn",
+                meaning: "pelafalan",
+                english: "pronunciation",
+                grammar: [
+                    {part: "定语", text: "他的", type: "subject"},
+                    {part: "主语", text: "汉语", type: "subject"},
+                    {part: "动词填空", text: "发音", type: "verb"},
+                    {part: "补语标记", text: "得", type: "adverb"},
+                    {part: "程度补语", text: "真好", type: "adverb"},
+                    {part: "结果补语", text: "听起来像本地人", type: "adverb"}
+                ],
+                grammarExplanation: "'得'是补语标记，连接动词和程度补语。'听起来像本地人'是结果补语，说明'发音'的效果。",
+                optionAnalysis: {
+                    "发音": "正确。'发音'专门指'pronunciation'，'发音得好'是正确搭配。",
+                    "声音": "不正确。'声音'意思是'voice'或'sound'，指物理声音，不指语言发音的准确性。",
+                    "说话": "不正确。'说话'意思是'speak'，'说话得好'不自然，应该说'说得好'，但这里需要的是'发音'这个更具体的词。",
+                    "语言": "不正确。'语言'意思是'language'，'语言得好'语法错误。"
+                }
+            },
+            {
+                sentence: "这个______太复杂了，我看不懂说明书。",
+                options: ["节目", "项目", "问题", "事情"],
+                answer: "节目",
+                pinyin: "jiémù",
+                meaning: "program (TV, acara)",
+                english: "program",
+                grammar: [
+                    {part: "指示代词", text: "这个", type: "subject"},
+                    {part: "名词填空", text: "节目", type: "object"},
+                    {part: "程度副词", text: "太", type: "adverb"},
+                    {part: "形容词", text: "复杂", type: "verb"},
+                    {part: "语气词", text: "了", type: "adverb"},
+                    {part: "主语", text: "我", type: "subject"},
+                    {part: "可能补语否定式", text: "看不懂", type: "verb"},
+                    {part: "宾语", text: "说明书", type: "object"}
+                ],
+                grammarExplanation: "这是一个因果复句。前半句说明原因('节目太复杂')，后半句说明结果('我看不懂说明书')。'看不懂'是可能补语的否定形式。",
+                optionAnalysis: {
+                    "节目": "正确。'节目'通常指电视节目或活动安排，可以很复杂。",
+                    "项目": "部分正确但不最佳。'项目'意思是'project'，也可以复杂，但通常与'说明书'关联较弱。",
+                    "问题": "不正确。'问题太复杂了'语法正确，但后半句'我看不懂说明书'与'问题'连接不自然。",
+                    "事情": "不正确。'事情太复杂了'语法正确，但太宽泛，与'说明书'关联不直接。"
+                }
+            },
+            {
+                sentence: "妈妈______我明天早点起床去机场。",
+                options: ["提醒", "告诉", "说", "通知"],
+                answer: "提醒",
+                pinyin: "tíxǐng",
+                meaning: "mengingatkan",
+                english: "remind",
+                grammar: [
+                    {part: "主语", text: "妈妈", type: "subject"},
+                    {part: "动词填空", text: "提醒", type: "verb"},
+                    {part: "间接宾语", text: "我", type: "object"},
+                    {part: "时间状语", text: "明天", type: "adverb"},
+                    {part: "连动短语", text: "早点起床去机场", type: "verb"}
+                ],
+                grammarExplanation: "'提醒'是双宾动词，可以接两个宾语(直接和间接)。'早点起床去机场'是连动短语，表示两个连续的动作。",
+                optionAnalysis: {
+                    "提醒": "正确。'提醒'意思是'remind'，用于让人记住某事，符合语境。",
+                    "告诉": "部分正确但不准确。'告诉'意思是'tell'，可以用于此句，但不如'提醒'准确表达'提醒'的含义。",
+                    "说": "不正确。'说我'语法错误，应该是'对我说'，但即使如此也不如'提醒'准确。",
+                    "通知": "不正确。'通知'意思是'notify'，更正式，通常用于官方或正式场合，家庭语境中不常用。"
+                }
+            },
+            {
+                sentence: "他对中国历史非常______，知道很多故事。",
+                options: ["感兴趣", "喜欢", "爱好", "热爱"],
+                answer: "感兴趣",
+                pinyin: "gǎn xìngqù",
+                meaning: "tertarik",
+                english: "interested",
+                grammar: [
+                    {part: "主语", text: "他", type: "subject"},
+                    {part: "介词", text: "对", type: "adverb"},
+                    {part: "介词宾语", text: "中国历史", type: "object"},
+                    {part: "程度副词", text: "非常", type: "adverb"},
+                    {part: "动词填空", text: "感兴趣", type: "verb"},
+                    {part: "并列分句", text: "知道很多故事", type: "verb"}
+                ],
+                grammarExplanation: "'对...感兴趣'是固定搭配，表示对某事物有兴趣。'知道很多故事'是并列分句，补充说明兴趣的表现。",
+                optionAnalysis: {
+                    "感兴趣": "正确。'对...感兴趣'是固定搭配，语法正确。",
+                    "喜欢": "不正确。'喜欢'后面直接接宾语，不能说'对中国历史非常喜欢'，应该说'非常喜欢中国历史'。",
+                    "爱好": "不正确。'爱好'是名词，不能与'非常'直接搭配，应该说'有爱好'。",
+                    "热爱": "不正确。'热爱'意思是'love deeply'，语法上可以说'热爱中国历史'，但这里需要'对...感兴趣'的结构。"
+                }
+            },
+            {
+                sentence: "图书馆里很安静，请大家不要______。",
+                options: ["说话", "聊天", "讲话", "交谈"],
+                answer: "说话",
+                pinyin: "shuōhuà",
+                meaning: "berbicara",
+                english: "speak",
+                grammar: [
+                    {part: "地点状语", text: "图书馆里", type: "adverb"},
+                    {part: "程度副词", text: "很", type: "adverb"},
+                    {part: "形容词谓语", text: "安静", type: "verb"},
+                    {part: "祈使标记", text: "请", type: "adverb"},
+                    {part: "宾语", text: "大家", type: "object"},
+                    {part: "否定副词", text: "不要", type: "adverb"},
+                    {part: "动词填空", text: "说话", type: "verb"}
+                ],
+                grammarExplanation: "这是一个祈使句。前一分句说明情况，后一分句提出要求。'请大家不要...'是礼貌的祈使句式。",
+                optionAnalysis: {
+                    "说话": "正确。'说话'是最常用的表示'speak'或'talk'的词，在这个语境中最自然。",
+                    "聊天": "部分正确但不最佳。'聊天'意思是'chat'，更随意，图书馆里通常用'不要说话'。",
+                    "讲话": "部分正确。'讲话'更正式，常用于正式场合，如'领导讲话'，在图书馆用'不要说话'更自然。",
+                    "交谈": "不正确。'交谈'意思是'converse'，更正式，不常用于这种日常祈使句。"
+                }
+            },
+            {
+                sentence: "我______坐地铁上班，因为不会堵车。",
+                options: ["总是", "经常", "通常", "常常"],
+                answer: "总是",
+                pinyin: "zǒngshì",
+                meaning: "selalu",
+                english: "always",
+                grammar: [
+                    {part: "主语", text: "我", type: "subject"},
+                    {part: "频率副词填空", text: "总是", type: "adverb"},
+                    {part: "方式状语", text: "坐地铁", type: "adverb"},
+                    {part: "谓语", text: "上班", type: "verb"},
+                    {part: "连词", text: "因为", type: "adverb"},
+                    {part: "原因", text: "不会堵车", type: "verb"}
+                ],
+                grammarExplanation: "'总是'表示频率的最高级，比'经常''常常'频率更高。'因为'引导原因状语从句，说明行为的原因。",
+                optionAnalysis: {
+                    "总是": "正确。'总是'表示100%频率，最符合'因为不会堵车'这个固定原因。",
+                    "经常": "部分正确但不如'总是'准确。'经常'表示often，但不如'总是'表达完全依赖地铁的意思。",
+                    "通常": "部分正确。'通常'表示usually，但语气不如'总是'强烈。",
+                    "常常": "部分正确。'常常'与'经常'相似，但'总是'更符合因为有固定理由而每次都选择地铁的情况。"
+                }
+            },
+            // 为节省空间，这里只显示8个示例问题
+            // 在实际应用中，您需要添加完整的100个问题
+        ];
+
+        // 游戏状态
+        let gameState = {
+            currentQuestionIndex: 0,
+            score: 0,
+            timeLeft: 80 * 60, // 80分钟转换为秒
+            timerInterval: null,
+            questions: [],
+            answered: false
+        };
+
+        // DOM元素
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const explanationContainer = document.getElementById('explanation-container');
+        const explanationContent = document.getElementById('explanation-content');
+        const nextBtn = document.getElementById('next-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const playAgainBtn = document.getElementById('play-again-btn');
+        const gameOverScreen = document.getElementById('game-over');
+        const questionContainer = document.getElementById('question-container');
+        const currentQuestionEl = document.getElementById('current-question');
+        const timeLeftEl = document.getElementById('time-left');
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        const correctCountEl = document.getElementById('correct-count');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const questionNumberEl = document.getElementById('question-number');
+        const finalScoreEl = document.getElementById('final-score');
+        const feedbackText = document.getElementById('feedback-text');
+
+        // 初始化游戏
+        function initGame() {
+            // 复制问题并随机排序
+            gameState.questions = [...hsk4Questions];
+            shuffleArray(gameState.questions);
+            
+            // 确保我们有100个问题（在实际中应该是完整的100个问题）
+            // 这里我们重复使用问题以填满100个
+            while (gameState.questions.length < 100) {
+                const extraQuestions = [...hsk4Questions];
+                shuffleArray(extraQuestions);
+                gameState.questions.push(...extraQuestions.slice(0, Math.min(extraQuestions.length, 100 - gameState.questions.length)));
+            }
+            gameState.questions = gameState.questions.slice(0, 100);
+            
+            // 重置游戏状态
+            gameState.currentQuestionIndex = 0;
+            gameState.score = 0;
+            gameState.timeLeft = 80 * 60;
+            gameState.answered = false;
+            
+            // 更新显示
+            updateQuestion();
+            updateProgress();
+            updateTimerDisplay();
+            correctCountEl.textContent = gameState.score;
+            totalQuestionsEl.textContent = gameState.questions.length;
+            
+            // 隐藏游戏结束界面
+            gameOverScreen.classList.remove('show');
+            questionContainer.style.display = 'block';
+            
+            // 启动计时器
+            if (gameState.timerInterval) clearInterval(gameState.timerInterval);
+            gameState.timerInterval = setInterval(updateTimer, 1000);
+            
+            // 禁用下一题按钮
+            nextBtn.disabled = true;
+        }
+
+        // 随机排序数组
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // 获取词汇信息
+        function getWordInfo(word) {
+            if (vocabularyDict[word]) {
+                return vocabularyDict[word];
+            } else {
+                // 如果词典中没有，返回默认值
+                return {
+                    pinyin: "(拼音未知)",
+                    meaning: "(释义未知)",
+                    type: "未知"
+                };
+            }
+        }
+
+        // 更新问题显示
+        function updateQuestion() {
+            const currentQuestion = gameState.questions[gameState.currentQuestionIndex];
+            
+            // 更新问题编号
+            questionNumberEl.textContent = gameState.currentQuestionIndex + 1;
+            currentQuestionEl.textContent = gameState.currentQuestionIndex + 1;
+            
+            // 创建带空白的句子
+            const sentenceWithBlank = currentQuestion.sentence.replace('______', '<span class="blank" id="answer-blank">______</span>');
+            questionText.innerHTML = sentenceWithBlank;
+            
+            // 清空选项容器
+            optionsContainer.innerHTML = '';
+            
+            // 随机排序选项
+            const shuffledOptions = [...currentQuestion.options];
+            shuffleArray(shuffledOptions);
+            
+            // 创建选项元素
+            shuffledOptions.forEach(option => {
+                const wordInfo = getWordInfo(option);
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.dataset.value = option;
+                
+                // 添加工具提示显示拼音和释义
+                const tooltip = document.createElement('div');
+                tooltip.className = 'option-tooltip';
+                tooltip.textContent = `${wordInfo.pinyin} - ${wordInfo.meaning}`;
+                optionElement.appendChild(tooltip);
+                
+                // 添加点击事件
+                optionElement.addEventListener('click', () => selectOption(option, optionElement));
+                
+                // 添加拖放功能
+                optionElement.setAttribute('draggable', 'true');
+                optionElement.addEventListener('dragstart', (e) => {
+                    if (!gameState.answered) {
+                        e.dataTransfer.setData('text/plain', option);
+                    }
+                });
+                
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            // 添加空白处的拖放功能
+            const blank = document.getElementById('answer-blank');
+            if (blank) {
+                blank.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    if (!gameState.answered) {
+                        blank.style.backgroundColor = '#e6f0ff';
+                    }
+                });
+                
+                blank.addEventListener('dragleave', () => {
+                    if (!gameState.answered) {
+                        blank.style.backgroundColor = '#f0f5ff';
+                    }
+                });
+                
+                blank.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    if (!gameState.answered) {
+                        const draggedOption = e.dataTransfer.getData('text/plain');
+                        // 找到对应的选项元素
+                        const optionElements = document.querySelectorAll('.option');
+                        optionElements.forEach(el => {
+                            if (el.textContent === draggedOption && !el.classList.contains('used')) {
+                                selectOption(draggedOption, el);
+                            }
+                        });
+                    }
+                    blank.style.backgroundColor = '#f0f5ff';
+                });
+            }
+            
+            // 隐藏解释
+            explanationContainer.classList.remove('show');
+            
+            // 重置答案状态
+            gameState.answered = false;
+            nextBtn.disabled = true;
+        }
+
+        // 选择选项
+        function selectOption(selectedValue, optionElement) {
+            if (gameState.answered) return;
+            
+            const currentQuestion = gameState.questions[gameState.currentQuestionIndex];
+            const blank = document.getElementById('answer-blank');
+            const isCorrect = selectedValue === currentQuestion.answer;
+            
+            // 更新空白处显示
+            blank.textContent = selectedValue;
+            blank.classList.add('filled');
+            
+            // 标记已使用的选项
+            optionElement.classList.add('used');
+            
+            // 检查答案
+            if (isCorrect) {
+                gameState.score++;
+                blank.style.color = '#43cea2';
+                blank.style.borderColor = '#43cea2';
+                blank.style.backgroundColor = '#f0fff8';
+            } else {
+                blank.style.color = '#ff416c';
+                blank.style.borderColor = '#ff416c';
+                blank.style.backgroundColor = '#fff0f3';
+            }
+            
+            // 显示解释
+            showExplanation(currentQuestion, isCorrect, selectedValue);
+            
+            // 更新分数显示
+            correctCountEl.textContent = gameState.score;
+            
+            // 启用下一题按钮
+            nextBtn.disabled = false;
+            
+            // 标记已回答
+            gameState.answered = true;
+            
+            // 更新进度
+            updateProgress();
+        }
+
+        // 显示解释，包含语法分解和选项分析
+        function showExplanation(question, isCorrect, selectedValue) {
+            // 构建语法分解HTML
+            let grammarHTML = '';
+            if (question.grammar && question.grammar.length > 0) {
+                grammarHTML += '<div class="grammar-analysis">';
+                grammarHTML += '<div class="grammar-title"><i class="fas fa-code"></i> 句子结构分解</div>';
+                
+                question.grammar.forEach(item => {
+                    const typeClass = item.type || '';
+                    grammarHTML += `
+                        <div class="grammar-item">
+                            <strong>${item.part}:</strong> 
+                            <span class="grammar-part ${typeClass}">${item.text}</span>
+                        </div>
+                    `;
+                });
+                
+                if (question.grammarExplanation) {
+                    grammarHTML += `<div class="grammar-item"><strong>语法说明:</strong> ${question.grammarExplanation}</div>`;
+                }
+                
+                grammarHTML += '</div>';
+            }
+            
+            // 构建选项分析HTML
+            let optionsAnalysisHTML = '';
+            if (question.optionAnalysis) {
+                optionsAnalysisHTML += '<div class="options-analysis">';
+                optionsAnalysisHTML += '<div class="section-title"><i class="fas fa-analytics"></i> 选项分析</div>';
+                
+                question.options.forEach(option => {
+                    const wordInfo = getWordInfo(option);
+                    const isOptionCorrect = option === question.answer;
+                    const isThisOption = option === selectedValue;
+                    
+                    let analysisText = question.optionAnalysis[option] || "暂无分析。";
+                    
+                    // 高亮用户选择的选项
+                    let selectionIndicator = "";
+                    if (isThisOption) {
+                        if (isOptionCorrect) {
+                            selectionIndicator = '<span style="color:#43cea2;font-weight:bold"> (您的选择 ✓)</span>';
+                        } else {
+                            selectionIndicator = '<span style="color:#ff416c;font-weight:bold"> (您的选择 ✗)</span>';
+                        }
+                    }
+                    
+                    optionsAnalysisHTML += `
+                        <div class="option-analysis-item ${isOptionCorrect ? 'correct' : 'incorrect'}">
+                            <div>
+                                <span class="option-word">${option}</span> 
+                                <span class="pinyin">${wordInfo.pinyin}</span> - 
+                                <span class="meaning">${wordInfo.meaning}</span>
+                                ${selectionIndicator}
+                            </div>
+                            <div><strong>分析:</strong> ${analysisText}</div>
+                        </div>
+                    `;
+                });
+                
+                optionsAnalysisHTML += '</div>';
+            }
+            
+            explanationContent.innerHTML = `
+                <div class="explanation-section">
+                    <div class="section-title"><i class="fas fa-check-circle"></i> 答题结果</div>
+                    <p><strong>正确答案:</strong> <span class="correct-answer">${question.answer}</span> 
+                    <span class="pinyin">${question.pinyin}</span> - 
+                    <span class="meaning">${question.meaning}</span></p>
+                    <p><strong>您的选择:</strong> ${selectedValue} ${isCorrect ? 
+                        '<span style="color:#43cea2;font-weight:bold">✓ 正确</span>' : 
+                        '<span style="color:#ff416c;font-weight:bold">✗ 错误</span>'}</p>
+                    <p><strong>英语释义:</strong> ${question.english}</p>
+                </div>
+                
+                <div class="explanation-section">
+                    <div class="section-title"><i class="fas fa-list-alt"></i> 完整句子</div>
+                    <p>${question.sentence.replace('______', `<strong class="correct-answer">${question.answer}</strong>`)}</p>
+                </div>
+                
+                ${grammarHTML}
+                
+                ${optionsAnalysisHTML}
+            `;
+            explanationContainer.classList.add('show');
+        }
+
+        // 更新进度条
+        function updateProgress() {
+            const progress = ((gameState.currentQuestionIndex + 1) / gameState.questions.length) * 100;
+            progressFill.style.width = `${progress}%`;
+            progressText.textContent = `${Math.round(progress)}%`;
+        }
+
+        // 更新计时器
+        function updateTimer() {
+            gameState.timeLeft--;
+            
+            if (gameState.timeLeft <= 0) {
+                clearInterval(gameState.timerInterval);
+                endGame();
+                return;
+            }
+            
+            updateTimerDisplay();
+        }
+
+        // 更新计时器显示
+        function updateTimerDisplay() {
+            const minutes = Math.floor(gameState.timeLeft / 60);
+            const seconds = gameState.timeLeft % 60;
+            timeLeftEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // 时间少于5分钟时改变颜色
+            if (gameState.timeLeft < 5 * 60) {
+                timeLeftEl.style.color = '#ff416c';
+            }
+        }
+
+        // 下一题
+        function nextQuestion() {
+            if (!gameState.answered) return;
+            
+            gameState.currentQuestionIndex++;
+            
+            if (gameState.currentQuestionIndex < gameState.questions.length) {
+                updateQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        // 结束游戏
+        function endGame() {
+            clearInterval(gameState.timerInterval);
+            
+            // 隐藏问题容器
+            questionContainer.style.display = 'none';
+            
+            // 显示游戏结束界面
+            gameOverScreen.classList.add('show');
+            
+            // 更新最终分数
+            finalScoreEl.textContent = `${gameState.score}/${gameState.questions.length}`;
+            
+            // 根据分数给出反馈
+            const percentage = (gameState.score / gameState.questions.length) * 100;
+            let feedback = '';
+            
+            if (percentage >= 90) {
+                feedback = "太棒了！您的HSK4词汇掌握得非常出色！理解每个选项的细微差别对汉语学习非常重要！";
+            } else if (percentage >= 80) {
+                feedback = "做得很好！您的HSK4词汇掌握得很好，通过分析每个选项的差异，您的汉语水平会进一步提高！";
+            } else if (percentage >= 70) {
+                feedback = "不错！您已经掌握了大部分HSK4词汇，继续学习每个选项的用法和区别，您的汉语会越来越流利！";
+            } else if (percentage >= 60) {
+                feedback = "继续努力！您已经掌握了基本的HSK4词汇，仔细分析每个选项的拼音和释义，会帮助您更好地理解汉语词汇的用法！";
+            } else {
+                feedback = "别灰心！学习每个选项的拼音和印尼语释义是理解汉语词汇的关键。通过分析每个选项的差异，您的汉语水平会提高很快！";
+            }
+            
+            feedbackText.textContent = feedback;
+        }
+
+        // 事件监听
+        nextBtn.addEventListener('click', nextQuestion);
+        restartBtn.addEventListener('click', initGame);
+        playAgainBtn.addEventListener('click', initGame);
+
+        // 初始化游戏
+        document.addEventListener('DOMContentLoaded', initGame);
+        
+        // 添加键盘快捷键支持
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !nextBtn.disabled) {
+                nextQuestion();
+            } else if (e.key === 'r' || e.key === 'R') {
+                initGame();
+            } else if (e.key === 'ArrowRight' && !nextBtn.disabled) {
+                nextQuestion();
+            }
+        });
+    </script>
+</body>
+</html>
